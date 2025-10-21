@@ -6,29 +6,50 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"path/filepath"
-	"strings"
 	"text/template"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type Background struct {
-	Name  string // Display name (underscores replaced with spaces)
-	Value string // Actual filename with extension
-	Type  string // "image" or "video"
-}
-
 var db *sql.DB
 
-// Supported file extensions
-var imageExtensions = map[string]bool{
-	".jpg": true, ".jpeg": true, ".png": true, ".gif": true, ".webp": true, ".bmp": true,
+// Sound represents an ambient sound
+type Sound struct {
+	Name string // Display name
+	Path string // File path
+	Icon string // Ionicon name
 }
 
-var videoExtensions = map[string]bool{
-	".mp4": true, ".webm": true, ".mov": true, ".avi": true, ".mkv": true, ".flv": true,
+// Background represents a background image or video
+type Background struct {
+	Name string // Display name
+	Path string // File path (filename with extension)
+	Icon string // Ionicon name
+	Type string // "image" or "video"
+}
+
+// GetSounds returns the list of available sounds
+func GetSounds() []Sound {
+	return []Sound{
+		{Name: "Fire", Path: "fire.mp3", Icon: "flame"},
+		{Name: "Rain", Path: "rain.mp3", Icon: "water"},
+		{Name: "Wind", Path: "wind.mp3", Icon: "cloud"},
+		{Name: "Forest", Path: "forest.mp3", Icon: "leaf"},
+		{Name: "Ocean", Path: "ocean.mp3", Icon: "water-outline"},
+		{Name: "Thunder", Path: "thunder.mp3", Icon: "flash"},
+		// Add more sounds here as needed
+	}
+}
+
+// GetBackgrounds returns the list of available backgrounds
+func GetBackgrounds() []Background {
+	return []Background{
+		{Name: "Vermont Cozziness", Path: "autum_cozy_vermont_bethroom.mov", Icon: "image", Type: "video"},
+		{Name: "Milan Lib", Path: "autum_eropean_library.mov", Icon: "image", Type: "video"},
+		{Name: "Boring street", Path: "autum_rain_sad_european_street.mov", Icon: "image", Type: "video"},
+		{Name: "River delight", Path: "autum_river_fire.mov", Icon: "image", Type: "video"},
+		{Name: "The Porch", Path: "rain_fire_summer_morning.mov", Icon: "image", Type: "video"},
+	}
 }
 
 func initDB() error {
@@ -50,57 +71,7 @@ func initDB() error {
 	return err
 }
 
-func getBackgrounds() ([]Background, error) {
-	files, err := os.ReadDir("public/bkgs")
-	if err != nil {
-		return []Background{}, nil
-	}
 
-	var backgrounds []Background
-	for _, file := range files {
-		if !file.IsDir() {
-			filename := file.Name()
-			ext := strings.ToLower(filepath.Ext(filename))
-			nameWithoutExt := strings.TrimSuffix(filename, ext)
-			// Replace underscores with spaces for display
-			displayName := strings.ReplaceAll(nameWithoutExt, "_", " ")
-
-			var bgType string
-			if imageExtensions[ext] {
-				bgType = "image"
-			} else if videoExtensions[ext] {
-				bgType = "video"
-			} else {
-				continue // Skip unsupported file types
-			}
-
-			backgrounds = append(backgrounds, Background{
-				Name:  displayName,
-				Value: filename,
-				Type:  bgType,
-			})
-		}
-	}
-	return backgrounds, nil
-}
-
-type Sound struct {
-	Name string // Display name
-	Path string // File path
-	Icon string // Ionicon name
-}
-
-func getSounds() []Sound {
-	return []Sound{
-		{Name: "Fire", Path: "fire.mp3", Icon: "flame"},
-		{Name: "Rain", Path: "rain.mp3", Icon: "water"},
-		{Name: "Wind", Path: "wind.mp3", Icon: "cloud"},
-		{Name: "Forest", Path: "forest.mp3", Icon: "leaf"},
-		{Name: "Ocean", Path: "ocean.mp3", Icon: "water-outline"},
-		{Name: "Thunder", Path: "thunder.mp3", Icon: "flash"},
-		// Add more sounds here as needed
-	}
-}
 
 func saveBackground(background string) error {
 	_, err := db.Exec(
@@ -207,14 +178,10 @@ func main() {
 		}
 
 		// Get backgrounds (images and videos)
-		backgrounds, err := getBackgrounds()
-		if err != nil {
-			http.Error(w, "Failed to read backgrounds", http.StatusInternalServerError)
-			return
-		}
+		backgrounds := GetBackgrounds()
 
 		// Get sounds
-		sounds := getSounds()
+		sounds := GetSounds()
 
 		// Parse and execute template
 		tmpl, err := template.ParseFiles("index.html")

@@ -420,3 +420,122 @@ body {
   min-width: 35px;
   text-align: right;
 }
+
+.active-sounds-container {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(60, 60, 60, 0.4);
+  display: none;
+}
+
+.active-sounds-container h3 {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.active-sounds-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sound-card {
+  border: 1px solid rgba(100, 100, 100, 0.6);
+  border-radius: 8px;
+  background: rgba(60, 60, 60, 0.5);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.sound-card:hover {
+  background: rgba(70, 70, 70, 0.6);
+  border-color: rgba(120, 120, 120, 0.7);
+}
+
+/* Compact view */
+.sound-card-compact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  gap: 8px;
+}
+
+.sound-card-title {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  font-weight: 600;
+  flex: 1;
+}
+
+.sound-card-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.sound-card-edit,
+.sound-card-remove {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.3s ease;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+}
+
+.sound-card-edit:hover {
+  color: rgba(100, 200, 255, 0.9);
+  background: rgba(100, 200, 255, 0.1);
+}
+
+.sound-card-remove:hover {
+  color: rgba(255, 100, 100, 0.9);
+  background: rgba(255, 100, 100, 0.1);
+}
+
+/* Expanded view */
+.sound-card-expanded {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  border-top: 1px solid rgba(100, 100, 100, 0.4);
+  background: rgba(50, 50, 50, 0.3);
+  width: 100%;
+}
+
+.sound-setting {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sound-setting label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  font-weight: 500;
+  min-width: 90px;
+}
+
+.sound-setting .volume-slider {
+  flex: 1;
+  height: 5px;
+}
+
+.setting-value {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  font-weight: 500;
+  min-width: 40px;
+  text-align: right;
+}
