@@ -35,20 +35,30 @@ func GetSounds() []Sound {
 		{Name: "Rain", Path: "rain.mp3", Icon: "water"},
 		{Name: "Wind", Path: "wind.mp3", Icon: "cloud"},
 		{Name: "Forest", Path: "forest.mp3", Icon: "leaf"},
-		{Name: "Ocean", Path: "ocean.mp3", Icon: "water-outline"},
-		{Name: "Thunder", Path: "thunder.mp3", Icon: "flash"},
-		// Add more sounds here as needed
+		{Name: "Ocean", Path: "ocean_waves.mp3", Icon: "water-outline"},
+		{Name: "Thunder", Path: "thunderstorm.mp3", Icon: "flash"},
+		{Name: "Coffee Shop", Path: "coffeeshop.mp3", Icon: "cafe"},
+		{Name: "Coffee Shop Loud", Path: "coffee_shop_loud.mp3", Icon: "cafe"},
+		{Name: "Cricket", Path: "cricket.mp3", Icon: "bug"},
+		{Name: "Heavy Rain", Path: "heavy_rain.mp3", Icon: "water"},
+		{Name: "Night Field", Path: "night_field.mp3", Icon: "moon"},
+		{Name: "Owl", Path: "owl.mp3", Icon: "egg"},
+		{Name: "Rain", Path: "rain_a.mp3", Icon: "water"},
+		{Name: "River", Path: "river.mp3", Icon: "water"},
+		{Name: "Siren", Path: "siren.mp3", Icon: "alert"},
+		{Name: "Traffic Outside", Path: "traffic_outside.mp3", Icon: "car"},
+		{Name: "Wolf", Path: "wolf.mp3", Icon: "paw"},
 	}
 }
 
 // GetBackgrounds returns the list of available backgrounds
 func GetBackgrounds() []Background {
 	return []Background{
-		{Name: "Vermont Cozziness", Path: "autum_cozy_vermont_bethroom.mov", Icon: "image", Type: "video"},
-		{Name: "Milan Lib", Path: "autum_eropean_library.mov", Icon: "image", Type: "video"},
-		{Name: "Boring street", Path: "autum_rain_sad_european_street.mov", Icon: "image", Type: "video"},
-		{Name: "River delight", Path: "autum_river_fire.mov", Icon: "image", Type: "video"},
-		{Name: "The Porch", Path: "rain_fire_summer_morning.mov", Icon: "image", Type: "video"},
+		{Name: "Vermont Cozziness", Path: "vermont_cozziness.mov", Icon: "image", Type: "video"},
+		{Name: "Milan Lib", Path: "milan_lib.mov", Icon: "image", Type: "video"},
+		{Name: "Boring street", Path: "sad_street.mov", Icon: "image", Type: "video"},
+		{Name: "River delight", Path: "river_delight.mov", Icon: "image", Type: "video"},
+		{Name: "The Porch", Path: "the_porch.mov", Icon: "image", Type: "video"},
 	}
 }
 

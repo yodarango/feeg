@@ -67,23 +67,25 @@
             <span id="globalVolumeValue">50%</span>
           </div>
 
-          <div class="sounds-grid">
-            {{range .Sounds}}
-            <button
-              class="sound-button-grid"
-              data-sound-path="{{.Path}}"
-              data-sound-name="{{.Name}}"
-              title="{{.Name}}"
-            >
-              <ion-icon name="{{.Icon}}"></ion-icon>
-              <span>{{.Name}}</span>
-            </button>
-            {{end}}
-          </div>
+          <div class="columns">
+            <div class="sounds-grid">
+              {{range .Sounds}}
+              <button
+                class="sound-button-grid"
+                data-sound-path="{{.Path}}"
+                data-sound-name="{{.Name}}"
+                title="{{.Name}}"
+              >
+                <ion-icon name="{{.Icon}}"></ion-icon>
+                <span>{{.Name}}</span>
+              </button>
+              {{end}}
+            </div>
 
-          <div class="active-sounds-container" id="activeSoundsContainer">
-            <h3>Active Sounds</h3>
-            <div class="active-sounds-list" id="activeSoundsList"></div>
+            <div class="active-sounds-container" id="activeSoundsContainer">
+              <h3>Active Sounds</h3>
+              <div class="active-sounds-list" id="activeSoundsList"></div>
+            </div>
           </div>
         </div>
       </div>

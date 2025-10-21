@@ -145,11 +145,22 @@ body {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   width: 90%;
   max-width: 400px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
   animation: slideUp 0.3s ease;
 }
 
 .modal-content.modal-sounds {
   max-width: 500px;
+}
+
+@media (min-width: 1000px) {
+  .modal-content.modal-sounds {
+    max-width: 90vw;
+    max-height: 90vh;
+    flex-direction: column;
+  }
 }
 
 @keyframes slideUp {
@@ -165,10 +176,11 @@ body {
 
 .modal-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: 20px;
   border-bottom: 1px solid rgba(60, 60, 60, 0.4);
+  position: relative;
 }
 
 .modal-header h2 {
@@ -189,6 +201,9 @@ body {
   align-items: center;
   justify-content: center;
   transition: color 0.3s ease;
+  position: absolute;
+  right: 20px;
+  top: 20px;
 }
 
 .modal-close:hover {
@@ -197,6 +212,64 @@ body {
 
 .modal-body {
   padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.global-volume-control {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+@media (min-width: 1000px) {
+  .modal-content.modal-sounds .modal-header {
+    flex-shrink: 0;
+  }
+
+  .modal-content.modal-sounds .modal-body {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .modal-content.modal-sounds .global-volume-control {
+    padding: 20px;
+    border-bottom: 1px solid rgba(60, 60, 60, 0.4);
+    flex-shrink: 0;
+  }
+
+  .modal-content.modal-sounds .columns {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    padding: 20px;
+    flex: 1;
+    overflow: hidden;
+    align-items: start;
+    justify-content: center;
+  }
+
+  .modal-content.modal-sounds .sound-button-grid {
+    flex: 0 0 65%;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    align-content: start;
+  }
+
+  .modal-content.modal-sounds .active-sounds-column {
+    flex: 0 0 35%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
 }
 
 .bg-select {
@@ -332,12 +405,13 @@ body {
 }
 
 .global-volume-control {
+  max-width: 300px;
   display: flex;
   align-items: center;
   gap: 12px;
   padding-bottom: 20px;
   border-bottom: 1px solid rgba(60, 60, 60, 0.4);
-  margin-bottom: 20px;
+  margin: 0 auto 20px;
 }
 
 .global-volume-control label {
