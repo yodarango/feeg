@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Background Flow</title>
+    <link rel="stylesheet" href="/public/styles.css" />
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/ionicons/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <noscript
+      ><script src="https://cdn.jsdelivr.net/npm/ionicons/dist/ionicons/ionicons.js"></script
+    ></noscript>
+  </head>
+  <body>
+    <div id="background"></div>
+    <video id="backgroundVideo" autoplay muted loop></video>
+
+    <div class="button-container">
+      <button class="bg-button" id="bgButton" title="Select Background">
+        <ion-icon name="image"></ion-icon>
+      </button>
+      <button class="sound-button" id="soundButton" title="Select Sound">
+        <ion-icon name="volume-high"></ion-icon>
+      </button>
+    </div>
+
+    <div class="modal" id="bgModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Select Background</h2>
+          <button class="modal-close" id="closeModal">
+            <ion-icon name="close"></ion-icon>
+          </button>
+        </div>
+        <div class="modal-body">
+          <select class="bg-select" id="bgSelect">
+            <option value="">Choose a background...</option>
+            {{range .Backgrounds}}
+            <option value="{{.Value}}" data-type="{{.Type}}">{{.Name}}</option>
+            {{end}}
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="soundModal">
+      <div class="modal-content modal-sounds">
+        <div class="modal-header">
+          <h2>Ambient Sounds</h2>
+          <button class="modal-close" id="closeSoundModal">
+            <ion-icon name="close"></ion-icon>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="global-volume-control">
+            <label for="globalVolumeSlider">Global Volume</label>
+            <input
+              type="range"
+              id="globalVolumeSlider"
+              class="volume-slider"
+              min="0"
+              max="100"
+              value="50"
+            />
+            <span id="globalVolumeValue">50%</span>
+          </div>
+
+          <div class="sounds-grid">
+            {{range .Sounds}}
+            <button
+              class="sound-button-grid"
+              data-sound-path="{{.Path}}"
+              data-sound-name="{{.Name}}"
+              title="{{.Name}}"
+            >
+              <ion-icon name="{{.Icon}}"></ion-icon>
+              <span>{{.Name}}</span>
+            </button>
+            {{end}}
+          </div>
+
+          <div
+            class="sound-volume-control"
+            id="soundVolumeControl"
+            style="display: none"
+          >
+            <label for="soundVolumeSlider">
+              <span id="activeSoundName">Sound</span> Volume
+            </label>
+            <input
+              type="range"
+              id="soundVolumeSlider"
+              class="volume-slider"
+              min="0"
+              max="100"
+              value="50"
+            />
+            <span id="soundVolumeValue">50%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const bgElement = document.getElementById("background");
+      const bgVideo = document.getElementById("backgroundVideo");
+      const bgSelect = document.getElementById("bgSelect");
+      const bgButton = document.getElementById("bgButton");
+      const bgModal = document.getElementById("bgModal");
+      const closeModal = document.getElementById("closeModal");
+
+      const soundButton = document.getElementById("soundButton");
+      const soundModal = document.getElementById("soundModal");
+      const closeSoundModal = document.getElementById("closeSoundModal");
+      const globalVolumeSlider = document.getElementById("globalVolumeSlider");
+      const globalVolumeValue = document.getElementById("globalVolumeValue");
+      const soundVolumeControl = document.getElementById("soundVolumeControl");
+      const soundVolumeSlider = document.getElementById("soundVolumeSlider");
+      const soundVolumeValue = document.getElementById("soundVolumeValue");
+      const activeSoundName = document.getElementById("activeSoundName");
+      const soundButtonsGrid = document.querySelectorAll(".sound-button-grid");
+
+      // Map to store audio elements for each sound
+      const audioPlayers = new Map();
+      const soundVolumes = new Map();
+      let activeSoundButton = null;
+      let globalVolume = 0.5;
+
+      // ===== BACKGROUND MODAL =====
+      // Open modal when button is clicked
+      bgButton.addEventListener("click", () => {
+        bgModal.classList.add("active");
+      });
+
+      // Close modal when close button is clicked
+      closeModal.addEventListener("click", () => {
+        bgModal.classList.remove("active");
+      });
+
+      // Close modal when clicking outside the modal content
+      bgModal.addEventListener("click", (e) => {
+        if (e.target === bgModal) {
+          bgModal.classList.remove("active");
+        }
+      });
+
+      // Handle background selection
+      bgSelect.addEventListener("change", (e) => {
+        const filename = e.target.value;
+        const type = e.target.options[e.target.selectedIndex].dataset.type;
+
+        if (filename) {
+          if (type === "video") {
+            // Hide image background, show video
+            bgElement.style.backgroundImage = "none";
+            bgVideo.src = `/public/bkgs/${filename}`;
+            bgVideo.style.display = "block";
+          } else {
+            // Hide video, show image background
+            bgVideo.style.display = "none";
+            bgElement.style.backgroundImage = `url('/public/bkgs/${filename}')`;
+          }
+
+          // Save preference to server
+          fetch("/api/save-background", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ background: filename }),
+          }).catch((error) =>
+            console.error("Failed to save background:", error)
+          );
+
+          // Close modal after selection
+          bgModal.classList.remove("active");
+        }
+      });
+
+      // Restore previously selected background
+      fetch("/api/get-background")
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.background) {
+            bgSelect.value = data.background;
+            bgSelect.dispatchEvent(new Event("change"));
+          }
+        })
+        .catch((error) => console.error("Failed to load background:", error));
+
+      // ===== SOUND MODAL =====
+      // Open sound modal when button is clicked
+      soundButton.addEventListener("click", () => {
+        soundModal.classList.add("active");
+      });
+
+      // Close sound modal when close button is clicked
+      closeSoundModal.addEventListener("click", () => {
+        soundModal.classList.remove("active");
+      });
+
+      // Close sound modal when clicking outside the modal content
+      soundModal.addEventListener("click", (e) => {
+        if (e.target === soundModal) {
+          soundModal.classList.remove("active");
+        }
+      });
+
+      // Handle global volume slider
+      globalVolumeSlider.addEventListener("input", (e) => {
+        globalVolume = e.target.value / 100;
+        globalVolumeValue.textContent = e.target.value + "%";
+
+        // Update all active sounds with new global volume
+        audioPlayers.forEach((audio, soundName) => {
+          if (audio.playing || !audio.paused) {
+            const soundVolume = soundVolumes.get(soundName) || 0.5;
+            audio.volume = globalVolume * soundVolume;
+          }
+        });
+      });
+
+      // Handle individual sound volume slider
+      soundVolumeSlider.addEventListener("input", (e) => {
+        const volume = e.target.value / 100;
+        soundVolumeValue.textContent = e.target.value + "%";
+
+        if (activeSoundButton) {
+          const soundName = activeSoundButton.dataset.soundName;
+          soundVolumes.set(soundName, volume);
+
+          const audio = audioPlayers.get(soundName);
+          if (audio) {
+            audio.volume = globalVolume * volume;
+          }
+        }
+      });
+
+      // Initialize sound buttons
+      soundButtonsGrid.forEach((button) => {
+        button.addEventListener("click", () => {
+          const soundPath = button.dataset.soundPath;
+          const soundName = button.dataset.soundName;
+
+          // Get or create audio element
+          let audio = audioPlayers.get(soundName);
+          if (!audio) {
+            audio = new Audio(`/public/sounds/${soundPath}`);
+            audio.loop = true;
+            audioPlayers.set(soundName, audio);
+            soundVolumes.set(soundName, 0.5);
+          }
+
+          // Toggle sound on/off
+          if (audio.paused) {
+            // Play sound
+            audio.volume = globalVolume * (soundVolumes.get(soundName) || 0.5);
+            audio.play();
+            button.classList.add("active");
+
+            // Update active button and show volume control
+            if (activeSoundButton) {
+              activeSoundButton.classList.remove("active");
+            }
+            activeSoundButton = button;
+            activeSoundName.textContent = soundName;
+            soundVolumeSlider.value =
+              (soundVolumes.get(soundName) || 0.5) * 100;
+            soundVolumeValue.textContent =
+              Math.round((soundVolumes.get(soundName) || 0.5) * 100) + "%";
+            soundVolumeControl.style.display = "flex";
+          } else {
+            // Stop sound
+            audio.pause();
+            audio.currentTime = 0;
+            button.classList.remove("active");
+
+            // Hide volume control if this was the active sound
+            if (activeSoundButton === button) {
+              activeSoundButton = null;
+              soundVolumeControl.style.display = "none";
+            }
+          }
+
+          // Save preference to server
+          fetch("/api/save-sound", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ sound: soundName }),
+          }).catch((error) => console.error("Failed to save sound:", error));
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,422 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, sans-serif;
+}
+
+#background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: -1;
+  transition: background-image 0.5s ease-in-out;
+}
+
+#backgroundVideo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+  display: none;
+}
+
+.button-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
+}
+
+.bg-button {
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(60, 60, 60, 0.6);
+  border-radius: 8px;
+  background: rgba(40, 40, 40, 0.4);
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  transition: all 0.3s ease;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  padding: 0;
+}
+
+.bg-button:hover {
+  background: rgba(50, 50, 50, 0.5);
+  border-color: rgba(80, 80, 80, 0.8);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.bg-button:active {
+  background: rgba(55, 55, 55, 0.6);
+  border-color: rgba(100, 100, 100, 0.9);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.sound-button {
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(60, 60, 60, 0.6);
+  border-radius: 8px;
+  background: rgba(40, 40, 40, 0.4);
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  transition: all 0.3s ease;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  padding: 0;
+  margin-top: 12px;
+}
+
+.sound-button:hover {
+  background: rgba(50, 50, 50, 0.5);
+  border-color: rgba(80, 80, 80, 0.8);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.sound-button:active {
+  background: rgba(55, 55, 55, 0.6);
+  border-color: rgba(100, 100, 100, 0.9);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: fadeIn 0.3s ease;
+}
+
+.modal.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background: rgba(40, 40, 40, 0.95);
+  border: 1px solid rgba(60, 60, 60, 0.6);
+  border-radius: 12px;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  width: 90%;
+  max-width: 400px;
+  animation: slideUp 0.3s ease;
+}
+
+.modal-content.modal-sounds {
+  max-width: 500px;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid rgba(60, 60, 60, 0.4);
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  font-size: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.3s ease;
+}
+
+.modal-close:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.bg-select {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 14px;
+  border: 1px solid rgba(60, 60, 60, 0.6);
+  border-radius: 8px;
+  background: rgba(50, 50, 50, 0.6);
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.bg-select:hover {
+  background: rgba(60, 60, 60, 0.7);
+  border-color: rgba(80, 80, 80, 0.8);
+}
+
+.bg-select:focus {
+  outline: none;
+  background: rgba(65, 65, 65, 0.8);
+  border-color: rgba(100, 100, 100, 0.9);
+}
+
+.bg-select option {
+  background: #2a2a2a;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 10px;
+}
+
+.sound-select {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 14px;
+  border: 1px solid rgba(60, 60, 60, 0.6);
+  border-radius: 8px;
+  background: rgba(50, 50, 50, 0.6);
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.sound-select:hover {
+  background: rgba(60, 60, 60, 0.7);
+  border-color: rgba(80, 80, 80, 0.8);
+}
+
+.sound-select:focus {
+  outline: none;
+  background: rgba(65, 65, 65, 0.8);
+  border-color: rgba(100, 100, 100, 0.9);
+}
+
+.sound-select option {
+  background: #2a2a2a;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 10px;
+}
+
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(60, 60, 60, 0.4);
+}
+
+.volume-control label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  font-weight: 500;
+  min-width: 50px;
+}
+
+.volume-slider {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(60, 60, 60, 0.6);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.volume-slider::-moz-range-thumb:hover {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
+.volume-slider::-moz-range-track {
+  background: transparent;
+  border: none;
+}
+
+#volumeValue {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  font-weight: 500;
+  min-width: 35px;
+  text-align: right;
+}
+
+.global-volume-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(60, 60, 60, 0.4);
+  margin-bottom: 20px;
+}
+
+.global-volume-control label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  font-weight: 500;
+  min-width: 100px;
+}
+
+.sounds-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.sound-button-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  border: 2px solid rgba(60, 60, 60, 0.6);
+  border-radius: 8px;
+  background: rgba(50, 50, 50, 0.6);
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 12px;
+  font-weight: 500;
+  min-height: 80px;
+}
+
+.sound-button-grid ion-icon {
+  font-size: 32px;
+  color: rgba(255, 255, 255, 0.7);
+  transition: color 0.3s ease;
+}
+
+.sound-button-grid:hover {
+  background: rgba(60, 60, 60, 0.7);
+  border-color: rgba(80, 80, 80, 0.8);
+}
+
+.sound-button-grid:hover ion-icon {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.sound-button-grid.active {
+  border-color: rgba(255, 255, 255, 0.9);
+  border-width: 2px;
+  background: rgba(60, 60, 60, 0.8);
+}
+
+.sound-button-grid.active ion-icon {
+  color: rgba(255, 255, 255, 1);
+}
+
+.sound-volume-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(60, 60, 60, 0.4);
+}
+
+.sound-volume-control label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  font-weight: 500;
+  min-width: 120px;
+}
+
+#globalVolumeValue,
+#soundVolumeValue {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  font-weight: 500;
+  min-width: 35px;
+  text-align: right;
+}
