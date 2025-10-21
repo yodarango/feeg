@@ -17,12 +17,38 @@
     <div id="background"></div>
     <video id="backgroundVideo" autoplay muted loop></video>
 
+    <div id="welcomeOverlay" class="welcome-overlay">
+      <div class="welcome-content">
+        <button id="playButton" class="play-button" title="Start Experience">
+          <ion-icon name="play"></ion-icon>
+        </button>
+      </div>
+    </div>
+
+    <div id="createMessage" class="create-message">
+      <span>Create your experience</span>
+    </div>
+
     <div class="button-container">
       <button class="bg-button" id="bgButton" title="Select Background">
         <ion-icon name="image"></ion-icon>
       </button>
       <button class="sound-button" id="soundButton" title="Select Sound">
         <ion-icon name="volume-high"></ion-icon>
+      </button>
+      <button
+        class="control-button"
+        id="fullscreenButton"
+        title="Toggle Fullscreen"
+      >
+        <ion-icon name="expand"></ion-icon>
+      </button>
+      <button
+        class="control-button"
+        id="clearButton"
+        title="Clear All Settings"
+      >
+        <ion-icon name="trash"></ion-icon>
       </button>
     </div>
 

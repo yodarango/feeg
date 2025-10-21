@@ -14,6 +14,12 @@ const activeSoundsContainer = document.getElementById("activeSoundsContainer");
 const activeSoundsList = document.getElementById("activeSoundsList");
 const soundButtonsGrid = document.querySelectorAll(".sound-button-grid");
 
+const welcomeOverlay = document.getElementById("welcomeOverlay");
+const playButton = document.getElementById("playButton");
+const createMessage = document.getElementById("createMessage");
+const fullscreenButton = document.getElementById("fullscreenButton");
+const clearButton = document.getElementById("clearButton");
+
 // State management
 const audioPlayers = new Map();
 const soundSettings = new Map();
@@ -69,13 +75,11 @@ document.querySelectorAll(".bg-grid-item").forEach((item) => {
         bgElement.style.backgroundImage = `url('/public/bkgs/${filename}')`;
       }
 
-      fetch("/api/save-background", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ background: filename }),
-      }).catch((error) => console.error("Failed to save background:", error));
+      // Save to localStorage
+      localStorage.setItem("selectedBackground", filename);
+
+      // Update welcome screen
+      initializeWelcomeScreen();
 
       bgModal.classList.remove("active");
     }
@@ -83,19 +87,142 @@ document.querySelectorAll(".bg-grid-item").forEach((item) => {
 });
 
 // Restore previously selected background
-fetch("/api/get-background")
-  .then((response) => response.json())
-  .then((data) => {
-    if (data.background) {
-      const item = document.querySelector(
-        `.bg-grid-item[data-bg-path="${data.background}"]`
-      );
-      if (item) {
-        item.click();
+const savedBackground = localStorage.getItem("selectedBackground");
+if (savedBackground) {
+  const item = document.querySelector(
+    `.bg-grid-item[data-bg-path="${savedBackground}"]`
+  );
+  if (item) {
+    item.click();
+  }
+}
+
+// Function to save sounds to localStorage
+function saveSoundsToLocalStorage() {
+  const soundsArray = Array.from(activeSounds);
+  const soundsData = {
+    sounds: soundsArray,
+    settings: Object.fromEntries(soundSettings),
+    globalVolume: globalVolume,
+  };
+  localStorage.setItem("activeSounds", JSON.stringify(soundsData));
+
+  // Update welcome screen
+  initializeWelcomeScreen();
+}
+
+// Function to restore sounds from localStorage
+function restoreSoundsFromLocalStorage() {
+  const savedData = localStorage.getItem("activeSounds");
+  if (savedData) {
+    try {
+      const soundsData = JSON.parse(savedData);
+      globalVolume = soundsData.globalVolume || 0.5;
+      globalVolumeSlider.value = globalVolume * 100;
+      globalVolumeValue.textContent = Math.round(globalVolume * 100) + "%";
+
+      // Restore settings
+      if (soundsData.settings) {
+        Object.entries(soundsData.settings).forEach(([soundName, settings]) => {
+          soundSettings.set(soundName, settings);
+        });
       }
+
+      // Restore active sounds
+      if (soundsData.sounds && Array.isArray(soundsData.sounds)) {
+        soundsData.sounds.forEach((soundName) => {
+          const button = document.querySelector(
+            `[data-sound-name="${soundName}"]`
+          );
+          if (button) {
+            button.click();
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Failed to restore sounds:", error);
     }
-  })
-  .catch((error) => console.error("Failed to load background:", error));
+  }
+}
+
+// Function to check if there are saved sounds and show appropriate UI
+function initializeWelcomeScreen() {
+  const savedData = localStorage.getItem("activeSounds");
+  const savedBackground = localStorage.getItem("selectedBackground");
+
+  if (savedData || savedBackground) {
+    // Show play button
+    welcomeOverlay.classList.remove("hidden");
+    createMessage.classList.remove("show");
+  } else {
+    // Show "Create your experience" message
+    welcomeOverlay.classList.add("hidden");
+    createMessage.classList.add("show");
+  }
+}
+
+// Play button click handler
+playButton.addEventListener("click", () => {
+  welcomeOverlay.classList.add("hidden");
+  createMessage.classList.remove("show");
+});
+
+// Fullscreen button click handler
+fullscreenButton.addEventListener("click", () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch((err) => {
+      console.error(`Error attempting to enable fullscreen: ${err.message}`);
+    });
+  } else {
+    document.exitFullscreen();
+  }
+});
+
+// Clear button click handler
+clearButton.addEventListener("click", () => {
+  if (
+    confirm(
+      "Are you sure you want to clear all settings? This cannot be undone."
+    )
+  ) {
+    // Clear localStorage
+    localStorage.removeItem("selectedBackground");
+    localStorage.removeItem("activeSounds");
+
+    // Stop all playing sounds
+    audioPlayers.forEach((audio) => {
+      audio.pause();
+      audio.currentTime = 0;
+    });
+
+    // Clear UI
+    activeSounds.clear();
+    soundSettings.clear();
+    audioPlayers.clear();
+
+    // Reset background
+    bgElement.style.backgroundImage = "";
+    bgVideo.style.display = "none";
+    bgVideo.src = "";
+
+    // Reset global volume
+    globalVolume = 0.5;
+    globalVolumeSlider.value = 50;
+    globalVolumeValue.textContent = "50%";
+
+    // Update UI
+    updateActiveSoundsDisplay();
+    document.querySelectorAll(".bg-grid-item").forEach((item) => {
+      item.classList.remove("active");
+    });
+    document.querySelectorAll(".sound-button-grid").forEach((button) => {
+      button.classList.remove("active");
+    });
+
+    // Show welcome screen
+    initializeWelcomeScreen();
+  }
+});
 
 // ===== SOUND MODAL =====
 soundButton.addEventListener("click", () => {
@@ -320,14 +447,7 @@ function updateActiveSoundsDisplay() {
       }
 
       updateActiveSoundsDisplay();
-
-      fetch("/api/save-sound", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ sound: soundName, action: "remove" }),
-      }).catch((error) => console.error("Failed to save sound:", error));
+      saveSoundsToLocalStorage();
     });
   });
 }
@@ -367,28 +487,20 @@ soundButtonsGrid.forEach((button) => {
       button.classList.add("active");
       activeSounds.add(soundName);
       updateActiveSoundsDisplay();
-
-      fetch("/api/save-sound", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ sound: soundName, action: "add" }),
-      }).catch((error) => console.error("Failed to save sound:", error));
+      saveSoundsToLocalStorage();
     } else {
       audio.pause();
       audio.currentTime = 0;
       button.classList.remove("active");
       activeSounds.delete(soundName);
       updateActiveSoundsDisplay();
-
-      fetch("/api/save-sound", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ sound: soundName, action: "remove" }),
-      }).catch((error) => console.error("Failed to save sound:", error));
+      saveSoundsToLocalStorage();
     }
   });
+});
+
+// Restore sounds on page load
+window.addEventListener("load", () => {
+  initializeWelcomeScreen();
+  restoreSoundsFromLocalStorage();
 });
