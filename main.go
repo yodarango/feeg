@@ -26,6 +26,13 @@ type Background struct {
 	Type      string // "image" or "video"
 }
 
+// Music represents a YouTube music video
+type Music struct {
+	Name      string // Display name
+	YouTubeID string // YouTube video ID
+	Icon      string // Ionicon name
+}
+
 // GetSounds returns the list of available sounds
 func GetSounds() []Sound {
 	return []Sound{
@@ -86,6 +93,13 @@ func GetBackgrounds() []Background {
 	return backgrounds
 }
 
+// GetMusic returns the list of available YouTube music videos
+func GetMusic() []Music {
+	return []Music{
+		{Name: "I surrender", YouTubeID: "54qRFH_9wI0", Icon: "musical-notes"},
+	}
+}
+
 
 
 func main() {
@@ -106,6 +120,9 @@ func main() {
 		// Get sounds
 		sounds := GetSounds()
 
+		// Get music
+		music := GetMusic()
+
 		// Parse and execute template
 		tmpl, err := template.ParseFiles("index.html")
 		if err != nil {
@@ -116,6 +133,7 @@ func main() {
 		data := map[string]interface{}{
 			"Backgrounds": backgrounds,
 			"Sounds":      sounds,
+			"Music":       music,
 		}
 
 		tmpl.Execute(w, data)

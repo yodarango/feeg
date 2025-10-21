@@ -20,12 +20,25 @@ const createMessage = document.getElementById("createMessage");
 const fullscreenButton = document.getElementById("fullscreenButton");
 const clearButton = document.getElementById("clearButton");
 
+const musicButton = document.getElementById("musicButton");
+const musicModal = document.getElementById("musicModal");
+const closeMusicModal = document.getElementById("closeMusicModal");
+const musicSelect = document.getElementById("musicSelect");
+const musicVolumeSlider = document.getElementById("musicVolumeSlider");
+const musicVolumeValue = document.getElementById("musicVolumeValue");
+const musicPlayer = document.getElementById("musicPlayer");
+
 // State management
 const audioPlayers = new Map();
 const soundSettings = new Map();
 const activeSounds = new Set();
 let globalVolume = 0.5;
 let expandedSound = null;
+
+// Music state
+let currentMusicID = null;
+let musicVolume = 0.5;
+let youtubePlayer = null;
 
 // Initialize sound settings structure
 function initSoundSettings(soundName) {
@@ -188,12 +201,18 @@ clearButton.addEventListener("click", () => {
     // Clear localStorage
     localStorage.removeItem("selectedBackground");
     localStorage.removeItem("activeSounds");
+    localStorage.removeItem("musicSettings");
 
     // Stop all playing sounds
     audioPlayers.forEach((audio) => {
       audio.pause();
       audio.currentTime = 0;
     });
+
+    // Stop music
+    if (youtubePlayer && youtubePlayer.stopVideo) {
+      youtubePlayer.stopVideo();
+    }
 
     // Clear UI
     activeSounds.clear();
@@ -210,6 +229,13 @@ clearButton.addEventListener("click", () => {
     globalVolumeSlider.value = 50;
     globalVolumeValue.textContent = "50%";
 
+    // Reset music
+    currentMusicID = null;
+    musicVolume = 0.5;
+    musicSelect.value = "";
+    musicVolumeSlider.value = 50;
+    musicVolumeValue.textContent = "50%";
+
     // Update UI
     updateActiveSoundsDisplay();
     document.querySelectorAll(".bg-grid-item").forEach((item) => {
@@ -223,6 +249,126 @@ clearButton.addEventListener("click", () => {
     initializeWelcomeScreen();
   }
 });
+
+// ===== MUSIC MODAL =====
+musicButton.addEventListener("click", () => {
+  musicModal.classList.add("active");
+});
+
+closeMusicModal.addEventListener("click", () => {
+  musicModal.classList.remove("active");
+});
+
+musicModal.addEventListener("click", (e) => {
+  if (e.target === musicModal) {
+    musicModal.classList.remove("active");
+  }
+});
+
+// Music volume slider
+musicVolumeSlider.addEventListener("input", (e) => {
+  musicVolume = e.target.value / 100;
+  musicVolumeValue.textContent = e.target.value + "%";
+
+  if (youtubePlayer && youtubePlayer.setVolume) {
+    youtubePlayer.setVolume(musicVolume * 100);
+  }
+
+  saveMusicToLocalStorage();
+});
+
+// Music select change
+musicSelect.addEventListener("change", (e) => {
+  const youtubeID = e.target.value;
+
+  if (youtubeID) {
+    currentMusicID = youtubeID;
+    loadYouTubePlayer(youtubeID);
+  } else {
+    currentMusicID = null;
+    if (youtubePlayer && youtubePlayer.stopVideo) {
+      youtubePlayer.stopVideo();
+    }
+  }
+
+  saveMusicToLocalStorage();
+});
+
+// Load YouTube IFrame API
+function loadYouTubeAPI() {
+  if (window.YT) {
+    return;
+  }
+
+  const tag = document.createElement("script");
+  tag.src = "https://www.youtube.com/iframe_api";
+  const firstScriptTag = document.getElementsByTagName("script")[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+}
+
+// Initialize YouTube player
+function loadYouTubePlayer(youtubeID) {
+  if (!window.YT) {
+    loadYouTubeAPI();
+    setTimeout(() => loadYouTubePlayer(youtubeID), 1000);
+    return;
+  }
+
+  if (youtubePlayer) {
+    youtubePlayer.loadVideoById(youtubeID);
+    youtubePlayer.playVideo();
+  } else {
+    youtubePlayer = new YT.Player("musicPlayer", {
+      height: "0",
+      width: "0",
+      videoId: youtubeID,
+      events: {
+        onReady: onPlayerReady,
+        onStateChange: onPlayerStateChange,
+      },
+    });
+  }
+}
+
+function onPlayerReady(event) {
+  event.target.setVolume(musicVolume * 100);
+  event.target.playVideo();
+}
+
+function onPlayerStateChange() {
+  // Handle player state changes if needed
+}
+
+// Save music to localStorage
+function saveMusicToLocalStorage() {
+  const musicData = {
+    currentMusicID: currentMusicID,
+    musicVolume: musicVolume,
+  };
+  localStorage.setItem("musicSettings", JSON.stringify(musicData));
+}
+
+// Restore music from localStorage
+function restoreMusicFromLocalStorage() {
+  const savedData = localStorage.getItem("musicSettings");
+  if (savedData) {
+    try {
+      const musicData = JSON.parse(savedData);
+      currentMusicID = musicData.currentMusicID || null;
+      musicVolume = musicData.musicVolume || 0.5;
+
+      musicVolumeSlider.value = musicVolume * 100;
+      musicVolumeValue.textContent = Math.round(musicVolume * 100) + "%";
+
+      if (currentMusicID) {
+        musicSelect.value = currentMusicID;
+        loadYouTubePlayer(currentMusicID);
+      }
+    } catch (error) {
+      console.error("Failed to restore music:", error);
+    }
+  }
+}
 
 // ===== SOUND MODAL =====
 soundButton.addEventListener("click", () => {
@@ -499,8 +645,12 @@ soundButtonsGrid.forEach((button) => {
   });
 });
 
+// Load YouTube API on page load
+loadYouTubeAPI();
+
 // Restore sounds on page load
 window.addEventListener("load", () => {
   initializeWelcomeScreen();
   restoreSoundsFromLocalStorage();
+  restoreMusicFromLocalStorage();
 });

@@ -344,6 +344,82 @@ body {
   gap: 10px;
 }
 
+/* Music Modal Styles */
+.modal-music {
+  max-width: 500px;
+  max-height: 90vh;
+}
+
+.music-volume-control {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.music-volume-control label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  min-width: 100px;
+}
+
+.music-volume-control .volume-slider {
+  flex: 1;
+  max-width: 200px;
+}
+
+.music-volume-control span {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  min-width: 50px;
+  text-align: right;
+}
+
+.music-select-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.music-select-container label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.music-select {
+  padding: 12px 16px;
+  border: 1px solid rgba(100, 150, 200, 0.5);
+  border-radius: 8px;
+  background: rgba(40, 60, 100, 0.4);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  cursor: pointer;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  transition: all 0.3s ease;
+}
+
+.music-select:hover {
+  background: rgba(50, 80, 120, 0.5);
+  border-color: rgba(150, 200, 255, 0.7);
+}
+
+.music-select:focus {
+  outline: none;
+  background: rgba(60, 100, 150, 0.6);
+  border-color: rgba(150, 200, 255, 0.9);
+  box-shadow: 0 0 12px rgba(100, 150, 200, 0.3);
+}
+
+.music-select option {
+  background: #1a2a4a;
+  color: rgba(255, 255, 255, 0.9);
+}
+
 @media (min-width: 1000px) {
   .modal-content.modal-sounds .modal-header {
     flex-shrink: 0;

@@ -36,6 +36,9 @@
       <button class="sound-button" id="soundButton" title="Select Sound">
         <ion-icon name="volume-high"></ion-icon>
       </button>
+      <button class="sound-button" id="musicButton" title="Select Music">
+        <ion-icon name="musical-notes"></ion-icon>
+      </button>
       <button
         class="control-button"
         id="fullscreenButton"
@@ -120,6 +123,43 @@
               <div class="active-sounds-list" id="activeSoundsList"></div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="musicModal">
+      <div class="modal-content modal-music">
+        <div class="modal-header">
+          <h2>Background Music</h2>
+          <button class="modal-close" id="closeMusicModal">
+            <ion-icon name="close"></ion-icon>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="music-volume-control">
+            <label for="musicVolumeSlider">Music Volume</label>
+            <input
+              type="range"
+              id="musicVolumeSlider"
+              class="volume-slider"
+              min="0"
+              max="100"
+              value="50"
+            />
+            <span id="musicVolumeValue">50%</span>
+          </div>
+
+          <div class="music-select-container">
+            <label for="musicSelect">Select Music</label>
+            <select id="musicSelect" class="music-select">
+              <option value="">None</option>
+              {{range .Music}}
+              <option value="{{.YouTubeID}}">{{.Name}}</option>
+              {{end}}
+            </select>
+          </div>
+
+          <div id="musicPlayer" style="display: none"></div>
         </div>
       </div>
     </div>
