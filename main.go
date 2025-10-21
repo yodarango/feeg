@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 	"text/template"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -22,10 +25,11 @@ type Sound struct {
 
 // Background represents a background image or video
 type Background struct {
-	Name string // Display name
-	Path string // File path (filename with extension)
-	Icon string // Ionicon name
-	Type string // "image" or "video"
+	Name      string // Display name
+	Path      string // File path (filename with extension)
+	Thumbnail string // Thumbnail image path (.webp)
+	Icon      string // Ionicon name
+	Type      string // "image" or "video"
 }
 
 // GetSounds returns the list of available sounds
@@ -53,13 +57,39 @@ func GetSounds() []Sound {
 
 // GetBackgrounds returns the list of available backgrounds
 func GetBackgrounds() []Background {
-	return []Background{
-		{Name: "Vermont Cozziness", Path: "vermont_cozziness.mov", Icon: "image", Type: "video"},
-		{Name: "Milan Lib", Path: "milan_lib.mov", Icon: "image", Type: "video"},
-		{Name: "Boring street", Path: "sad_street.mov", Icon: "image", Type: "video"},
-		{Name: "River delight", Path: "river_delight.mov", Icon: "image", Type: "video"},
-		{Name: "The Porch", Path: "the_porch.mov", Icon: "image", Type: "video"},
+	files, err := os.ReadDir("public/bkgs")
+	if err != nil {
+		return []Background{}
 	}
+
+	var backgrounds []Background
+	seenNames := make(map[string]bool)
+
+	for _, file := range files {
+		if !file.IsDir() {
+			filename := file.Name()
+			ext := strings.ToLower(filepath.Ext(filename))
+			nameWithoutExt := strings.TrimSuffix(filename, ext)
+
+			// Skip if we've already processed this background
+			if seenNames[nameWithoutExt] {
+				continue
+			}
+			seenNames[nameWithoutExt] = true
+
+			// Replace underscores with spaces for display
+			displayName := strings.ReplaceAll(nameWithoutExt, "_", " ")
+
+			backgrounds = append(backgrounds, Background{
+				Name:      displayName,
+				Path:      nameWithoutExt + ".mov",
+				Thumbnail: nameWithoutExt + ".webp",
+				Icon:      "play-circle",
+				Type:      "video",
+			})
+		}
+	}
+	return backgrounds
 }
 
 func initDB() error {

@@ -157,6 +157,7 @@ body {
 
 @media (min-width: 1000px) {
   .modal-content.modal-sounds {
+    width: auto;
     max-width: 90vw;
     max-height: 90vh;
     flex-direction: column;
@@ -300,6 +301,59 @@ body {
   background: #2a2a2a;
   color: rgba(255, 255, 255, 0.9);
   padding: 10px;
+}
+
+.bg-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+  width: 100%;
+}
+
+.bg-grid-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px;
+  border: 2px solid rgba(60, 60, 60, 0.6);
+  border-radius: 8px;
+  background: rgba(50, 50, 50, 0.4);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  aspect-ratio: 1;
+  overflow: hidden;
+}
+
+.bg-grid-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+  transition: transform 0.3s ease;
+}
+
+.bg-grid-item span {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  word-break: break-word;
+  display: none;
+}
+
+.bg-grid-item:hover {
+  border-color: rgba(100, 100, 100, 0.9);
+  background: rgba(60, 60, 60, 0.6);
+}
+
+.bg-grid-item:hover img {
+  transform: scale(1.05);
+}
+
+.bg-grid-item.active {
+  border-color: rgba(100, 200, 255, 0.8);
+  box-shadow: 0 0 10px rgba(100, 200, 255, 0.4);
 }
 
 .sound-select {

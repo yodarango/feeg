@@ -1,7 +1,6 @@
 // DOM Elements
 const bgElement = document.getElementById("background");
 const bgVideo = document.getElementById("backgroundVideo");
-const bgSelect = document.getElementById("bgSelect");
 const bgButton = document.getElementById("bgButton");
 const bgModal = document.getElementById("bgModal");
 const closeModal = document.getElementById("closeModal");
@@ -48,31 +47,39 @@ bgModal.addEventListener("click", (e) => {
   }
 });
 
-// Handle background selection
-bgSelect.addEventListener("change", (e) => {
-  const filename = e.target.value;
-  const type = e.target.options[e.target.selectedIndex].dataset.type;
+// Handle background grid item selection
+document.querySelectorAll(".bg-grid-item").forEach((item) => {
+  item.addEventListener("click", () => {
+    const filename = item.dataset.bgPath;
+    const type = item.dataset.bgType;
 
-  if (filename) {
-    if (type === "video") {
-      bgElement.style.backgroundImage = "none";
-      bgVideo.src = `/public/bkgs/${filename}`;
-      bgVideo.style.display = "block";
-    } else {
-      bgVideo.style.display = "none";
-      bgElement.style.backgroundImage = `url('/public/bkgs/${filename}')`;
+    // Update active state
+    document.querySelectorAll(".bg-grid-item").forEach((i) => {
+      i.classList.remove("active");
+    });
+    item.classList.add("active");
+
+    if (filename) {
+      if (type === "video") {
+        bgElement.style.backgroundImage = "none";
+        bgVideo.src = `/public/bkgs/${filename}`;
+        bgVideo.style.display = "block";
+      } else {
+        bgVideo.style.display = "none";
+        bgElement.style.backgroundImage = `url('/public/bkgs/${filename}')`;
+      }
+
+      fetch("/api/save-background", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ background: filename }),
+      }).catch((error) => console.error("Failed to save background:", error));
+
+      bgModal.classList.remove("active");
     }
-
-    fetch("/api/save-background", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ background: filename }),
-    }).catch((error) => console.error("Failed to save background:", error));
-
-    bgModal.classList.remove("active");
-  }
+  });
 });
 
 // Restore previously selected background
@@ -80,8 +87,12 @@ fetch("/api/get-background")
   .then((response) => response.json())
   .then((data) => {
     if (data.background) {
-      bgSelect.value = data.background;
-      bgSelect.dispatchEvent(new Event("change"));
+      const item = document.querySelector(
+        `.bg-grid-item[data-bg-path="${data.background}"]`
+      );
+      if (item) {
+        item.click();
+      }
     }
   })
   .catch((error) => console.error("Failed to load background:", error));

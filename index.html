@@ -35,12 +35,19 @@
           </button>
         </div>
         <div class="modal-body">
-          <select class="bg-select" id="bgSelect">
-            <option value="">Choose a background...</option>
+          <div class="bg-grid">
             {{range .Backgrounds}}
-            <option value="{{.Path}}" data-type="{{.Type}}">{{.Name}}</option>
+            <button
+              class="bg-grid-item"
+              data-bg-path="{{.Path}}"
+              data-bg-type="{{.Type}}"
+              title="{{.Name}}"
+            >
+              <img src="/public/bkgs/{{.Thumbnail}}" alt="{{.Name}}" />
+              <span>{{.Name}}</span>
+            </button>
             {{end}}
-          </select>
+          </div>
         </div>
       </div>
     </div>
