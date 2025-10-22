@@ -97,6 +97,7 @@ func GetBackgrounds() []Background {
 func GetMusic() []Music {
 	return []Music{
 		{Name: "I surrender", YouTubeID: "54qRFH_9wI0", Icon: "musical-notes"},
+		{Name: "Soaking", YouTubeID: "Xx1MjhzKcYw", Icon: "musical-notes"},
 	}
 }
 
