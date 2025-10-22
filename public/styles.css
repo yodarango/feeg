@@ -854,6 +854,29 @@ body {
   height: 5px;
 }
 
+.loop-time-input {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid rgba(100, 100, 100, 0.6);
+  border-radius: 4px;
+  background: rgba(50, 50, 50, 0.8);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.loop-time-input:focus {
+  outline: none;
+  border-color: rgba(150, 150, 150, 0.8);
+  background: rgba(60, 60, 60, 0.9);
+  box-shadow: 0 0 8px rgba(100, 100, 100, 0.3);
+}
+
+.loop-time-input:hover {
+  border-color: rgba(120, 120, 120, 0.7);
+}
+
 .setting-value {
   color: rgba(255, 255, 255, 0.7);
   font-size: 12px;

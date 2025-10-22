@@ -521,22 +521,20 @@ function updateActiveSoundsDisplay() {
     loopSection.className = "sound-setting";
 
     const loopLabel = document.createElement("label");
-    loopLabel.textContent = "Loop Wait (ms)";
+    loopLabel.textContent = "Loop Wait (seconds)";
 
-    const loopSlider = document.createElement("input");
-    loopSlider.type = "range";
-    loopSlider.className = "volume-slider";
-    loopSlider.min = "0";
-    loopSlider.max = "5000";
-    loopSlider.step = "100";
-    loopSlider.value = settings.loopTime;
+    const loopInput = document.createElement("input");
+    loopInput.type = "text";
+    loopInput.className = "loop-time-input";
+    loopInput.value = (settings.loopTime / 1000).toFixed(1);
+    loopInput.placeholder = "0.0";
 
     const loopValue = document.createElement("span");
     loopValue.className = "setting-value";
-    loopValue.textContent = settings.loopTime + "ms";
+    loopValue.textContent = (settings.loopTime / 1000).toFixed(1) + "s";
 
     loopSection.appendChild(loopLabel);
-    loopSection.appendChild(loopSlider);
+    loopSection.appendChild(loopInput);
     loopSection.appendChild(loopValue);
 
     expandedView.appendChild(volumeSection);
@@ -593,10 +591,19 @@ function updateActiveSoundsDisplay() {
       }
     });
 
-    loopSlider.addEventListener("input", (e) => {
-      const loopTime = parseInt(e.target.value);
-      loopValue.textContent = loopTime + "ms";
-      settings.loopTime = loopTime;
+    loopInput.addEventListener("input", (e) => {
+      const inputValue = e.target.value;
+
+      // Validate that input is a valid number
+      if (inputValue === "" || !isNaN(inputValue)) {
+        const loopTimeSeconds = parseFloat(inputValue) || 0;
+        const loopTimeMs = Math.max(0, loopTimeSeconds * 1000); // Ensure non-negative
+        loopValue.textContent = loopTimeSeconds.toFixed(1) + "s";
+        settings.loopTime = loopTimeMs;
+      } else {
+        // If invalid, revert to previous value
+        e.target.value = (settings.loopTime / 1000).toFixed(1);
+      }
     });
 
     removeButton.addEventListener("click", () => {
