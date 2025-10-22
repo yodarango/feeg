@@ -34,6 +34,7 @@ const soundSettings = new Map();
 const activeSounds = new Set();
 let globalVolume = 0.5;
 let expandedSound = null;
+let hasShownPlayButton = false;
 
 // Music state
 let currentMusicID = null;
@@ -91,9 +92,6 @@ document.querySelectorAll(".bg-grid-item").forEach((item) => {
       // Save to localStorage
       localStorage.setItem("selectedBackground", filename);
 
-      // Update welcome screen
-      initializeWelcomeScreen();
-
       bgModal.classList.remove("active");
     }
   });
@@ -119,9 +117,6 @@ function saveSoundsToLocalStorage() {
     globalVolume: globalVolume,
   };
   localStorage.setItem("activeSounds", JSON.stringify(soundsData));
-
-  // Update welcome screen
-  initializeWelcomeScreen();
 }
 
 // Function to restore sounds from localStorage
@@ -164,13 +159,17 @@ function initializeWelcomeScreen() {
   const savedBackground = localStorage.getItem("selectedBackground");
 
   if (savedData || savedBackground) {
-    // Show play button
-    welcomeOverlay.classList.remove("hidden");
-    createMessage.classList.remove("show");
+    // Show play button only on initial load
+    if (!hasShownPlayButton) {
+      welcomeOverlay.classList.remove("hidden");
+      createMessage.classList.remove("show");
+      hasShownPlayButton = true;
+    }
   } else {
     // Show "Create your experience" message
     welcomeOverlay.classList.add("hidden");
     createMessage.classList.add("show");
+    hasShownPlayButton = false;
   }
 }
 
@@ -178,6 +177,25 @@ function initializeWelcomeScreen() {
 playButton.addEventListener("click", () => {
   welcomeOverlay.classList.add("hidden");
   createMessage.classList.remove("show");
+
+  // Play all saved sounds
+  activeSounds.forEach((soundName) => {
+    const audio = audioPlayers.get(soundName);
+    if (audio && audio.paused) {
+      const settings = soundSettings.get(soundName);
+      audio.volume = globalVolume * settings.volume;
+      audio.playbackRate = settings.speed;
+      audio.play();
+    }
+  });
+
+  // Play saved music if it exists
+  if (currentMusicID && youtubePlayer && youtubePlayer.playVideo) {
+    youtubePlayer.playVideo();
+  }
+
+  // Mark that play button has been used - it should never show again
+  hasShownPlayButton = true;
 });
 
 // Fullscreen button click handler
@@ -244,6 +262,9 @@ clearButton.addEventListener("click", () => {
     document.querySelectorAll(".sound-button-grid").forEach((button) => {
       button.classList.remove("active");
     });
+
+    // Reset play button flag so it shows again on next load
+    hasShownPlayButton = false;
 
     // Show welcome screen
     initializeWelcomeScreen();
