@@ -96,6 +96,9 @@ func GetBackgrounds() []Background {
 // GetMusic returns the list of available YouTube music videos
 func GetMusic() []Music {
 	return []Music{
+		{Name: "Yellow Cherry among poppies", YouTubeID: "__1uVWUSJe4", Icon: "musical-notes"},
+		{Name: "Yellow Cherry at the park", YouTubeID: "mT4g0paZ5gI", Icon: "musical-notes"},
+		{Name: "Yellow Cherry at the lake", YouTubeID: "DkD3dJaqjcE", Icon: "musical-notes"},
 		{Name: "I surrender", YouTubeID: "54qRFH_9wI0", Icon: "musical-notes"},
 		{Name: "Soaking", YouTubeID: "Xx1MjhzKcYw", Icon: "musical-notes"},
 	}
